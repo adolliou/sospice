@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from pathlib import Path
 from itertools import cycle
-
 import matplotlib.colors as mcolors
 import pandas as pd
 import numpy as np
+import warnings
 
+from parfive import Downloader
 from astropy.utils.data import download_file
 
 from .release import Release
@@ -451,3 +452,62 @@ class Catalog(pd.DataFrame):
                 fontsize="xx-large",
                 borderaxespad=2,
             )
+
+    def download_files(
+        self,
+        base_dir=".",
+        base_url=None,
+        release=None,
+        keep_tree=True,
+        downloader=None,
+        max_download=None,
+    ):
+        """
+        Download all files from Catalog.,
+
+        Parameters
+        ----------
+        base_dir: Path or str
+            Base directory to download file to
+        base_url: str
+            Base URL for file
+        release: Release or str
+            Release to download file from
+        keep_tree: bool
+            Keep tree directory structure (by level and date)
+        downloader: parfive.Downloader
+            If provided, enqueue file for download instead of downloading it.
+            To download enqueued files, run `downloader.download()`
+        max_download: int
+            Maximum number of files to be downloaded.
+
+        Return
+        ------
+        parfive.Result
+            Download result (or None if file has only been enqueued)
+        """
+        default_max_download = 1000
+        if max_download is None:
+            max_download = default_max_download
+        elif max_download > default_max_download:
+            warnings.warn(
+                "You are overriding the default max_download: This might cause performance issues."
+            )
+        do_download = False
+        if downloader is None:
+            downloader = Downloader(overwrite=False)
+            do_download = True
+        self.iloc[:max_download].apply(
+            lambda row: FileMetadata(row).download_file(
+                base_dir=base_dir,
+                base_url=base_url,
+                release=release,
+                keep_tree=keep_tree,
+                downloader=downloader,
+            ),
+            axis=1,
+        )
+        if do_download:
+            result = downloader.download()
+            return result
+        return
