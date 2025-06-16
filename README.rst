@@ -89,4 +89,4 @@ requests <https://github.com/solo-spice/sospice/pulls>`__.
 Citation
 --------
 
-See the `citation <sospice/CITATION.rst>`__ file.
+See the `citation <https://github.com/solo-spice/sospice/blob/main/sospice/CITATION.rst>`__ file.
