@@ -3,11 +3,9 @@ import numpy as np
 import skimage
 
 
-
-
-def get_cmap(logt: float): 
+def get_cmap(logt: float):
     """
-    Return a colormap according to the line temperature 
+    Return a colormap according to the line temperature
 
     Parameters
     ----------
@@ -21,7 +19,7 @@ def get_cmap(logt: float):
     main_color = _get_main_color(logt)
     if main_color is None:
         raise ValueError("logt should be between 4.0 abd 6.0")
-    
+
     _, a, b = skimage.color.rgb2lab(main_color)
     L = np.linspace(0, 100, 256)
     a = np.repeat(a, L.size)
@@ -40,8 +38,6 @@ def get_cmap(logt: float):
     cdict = {k: list(zip(x, v, v)) for k, v in zip(rgb_names, rgb.T)}
     cmap = mpl.colors.LinearSegmentedColormap(f"logt_{logt:.1f}", cdict)
     return cmap
-
-
 
 
 def _get_main_color(logt, logt_range=(4, 6), saturation=0.5, hue_factor=0.9):
@@ -72,6 +68,3 @@ def _get_main_color(logt, logt_range=(4, 6), saturation=0.5, hue_factor=0.9):
 
     else:
         return None
-
-
-
