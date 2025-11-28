@@ -18,7 +18,7 @@ def get_cmap(logt: float):
     """
     main_color = _get_main_color(logt)
     if main_color is None:
-        raise ValueError("logt should be between 4.0 abd 6.0")
+        raise ValueError("logt should be between 4.0 and 6.0")
 
     _, a, b = skimage.color.rgb2lab(main_color)
     L = np.linspace(0, 100, 256)
