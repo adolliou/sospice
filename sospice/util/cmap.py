@@ -3,7 +3,7 @@ import numpy as np
 import skimage
 
 
-def get_cmap(logt: float):
+def get_cmap(logt: float, logt_range=(4, 6), saturation=0.5, hue_factor=0.9):
     """
     Return a colormap according to the line temperature
 
@@ -11,14 +11,23 @@ def get_cmap(logt: float):
     ----------
     logt: float
         Base-10 logarithm of temperature in K
+    logt_range: tuple
+        Range of base-10 logarithm of temperature, in K
+    saturation: float
+        Factor that determines the saturation of the colormap        
+    hue_factor: float
+        Factor to apply to hue, so that not all the hue axis is used (avoid cycling back to red after purple)        
     Return
     ------
     mpl.colors.LinearSegmentedColormap
 
     """
-    main_color = _get_main_color(logt)
-    if main_color is None:
-        raise ValueError("logt should be between 4.0 and 6.0")
+    main_color = _get_main_color(
+        logt       = logt,
+        logt_range = logt_range, 
+        saturation = saturation,
+        hue_factor = hue_factor,
+        )
 
     _, a, b = skimage.color.rgb2lab(main_color)
     L = np.linspace(0, 100, 256)
@@ -50,6 +59,8 @@ def _get_main_color(logt, logt_range=(4, 6), saturation=0.5, hue_factor=0.9):
         Base-10 logarithm of temperature in K
     logt_range: tuple
         Range of base-10 logarithm of temperature, in K
+    saturation: float
+        Factor that determines the saturation of the colormap
     hue_factor: float
         Factor to apply to hue, so that not all the hue axis is used (avoid cycling back to red after purple)
 
@@ -58,13 +69,13 @@ def _get_main_color(logt, logt_range=(4, 6), saturation=0.5, hue_factor=0.9):
     numpy.ndarray or None
         RGB values (between 0 and 1) for main color, or None if logt is not in logt range
     """
+    
     logt_fraction = (logt - logt_range[0]) / (logt_range[1] - logt_range[0])
-    if 0 <= logt_fraction <= 1:
-        lab = skimage.color.lch2lab(
-            [50, 100 * saturation, logt_fraction * 2 * np.pi * hue_factor]
-        )
-        rgb = skimage.color.lab2rgb(lab)
-        return rgb
+    logt_fraction = np.clip(logt_fraction, a_min=0, a_max = 1)
+    lab = skimage.color.lch2lab(
+        [50, 100 * saturation, logt_fraction * 2 * np.pi * hue_factor]
+    )
+    rgb = skimage.color.lab2rgb(lab)
+    return rgb
 
-    else:
-        return None
+ 
