@@ -36,7 +36,7 @@ def get_cmap(logt: float):
     rgb_names = ("red", "green", "blue")
     x = np.linspace(0, 1, len(rgb))
     cdict = {k: list(zip(x, v, v)) for k, v in zip(rgb_names, rgb.T)}
-    cmap = mpl.colors.LinearSegmentedColormap(f"logt_{logt:.1f}", cdict)
+    cmap = mpl.colors.LinearSegmentedColormap(f"spice_logt_{logt:.1f}", cdict)
     return cmap
 
 
