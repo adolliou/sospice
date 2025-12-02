@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-def _get_radcal_ttype(header_l2: fits.header, hdu_binary: fits.BinTableHDU):
+def _get_radcal_ttype(header_l2: fits.header):
     """
     Return the column number of the radiometric calibration in the
     binary table corresponding to the given FITS HDU header. 
@@ -48,7 +48,7 @@ def get_radcal_from_hdus(hdu: fits.ImageHDU, hdu_binary: fits.BinTableHDU, retur
 
     #TODO assert hdu to be for a spectral window.
 
-    radcal_ttype    = _get_radcal_ttype(hdu.header, hdu_binary)
+    radcal_ttype    = _get_radcal_ttype(hdu.header)
     radcal_array    = np.squeeze(hdu_binary.data[radcal_ttype])
     if return_base_wavelength:
         w = WCS(hdu.header)
